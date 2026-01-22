@@ -12,15 +12,17 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
 ]
-name = "masterdata-parser-example"
-description = "An example parser for openBIS using the bam-masterdata interface."
+name = "creep-test-parser"
+description = "An openBIS parser for creep testing data in BAM."
 dynamic = ["version"]
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
+  { name = "Markus Schilling"},
   { name = "BAM Data Store", email = "datastore@bam.de" },
 ]
 maintainers = [
+  { name = "Markus Schilling"},
   { name = "Jose M. Pizarro", email = "jose.pizarro-blanco@bam.de" },
 ]
 license = { file = "LICENSE" }
@@ -29,8 +31,8 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/BAMresearch/masterdata-parser-example"
-"Bug Tracker" = "https://github.com/BAMresearch/masterdata-parser-example/issues"
+"Homepage" = "https://github.com/BAMresearch/creep-test-parser"
+"Bug Tracker" = "https://github.com/BAMresearch/creep-test-parser/issues"
 
 [project.optional-dependencies]
 dev = [
@@ -43,7 +45,7 @@ dev = [
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
-include = ["src/masterdata_parser_example/*.py", "tests/*.py"]
+include = ["src/creep_test_parser/*.py", "tests/*.py"]
 exclude = [
     ".bzr",
     ".direnv",
@@ -124,7 +126,7 @@ package-dir = { "" = "src" }
 where = ["src"]
 
 [tool.setuptools_scm]
-write_to = "src/masterdata_parser_example/_version.py"
+write_to = "src/creep_test_parser/_version.py"
 
 [project.entry-points."bam.parsers"]
-masterdata_parser_example_entry_point = "masterdata_parser_example:masterdata_parser_example_entry_point"
+creep_test_parser_entry_point = "creep_test_parser:creep_test_parser_entry_point"
