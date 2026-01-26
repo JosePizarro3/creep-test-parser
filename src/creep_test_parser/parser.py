@@ -13,6 +13,12 @@ class BaseFileParser(ABC):
 
 
 class ExcelParser(BaseFileParser):
+    # this class could handle excel parsing + custom parsing depending on the file format (like this example)
+    #
+    # this means that, this class (and `BaseFileParser`) should be in bam_masterdata.parsing module instead, and here
+    # we just overwrite `custom_parser()` method for our specific case
+    # Then, the BaseFileParser could be a layer to handle different file types (csv, json, xml, etc) if needed in the future
+    # and ExcelParser would handle only excel files (note: BaseFileParser might be an interface (i.e., a plain class) instead of an abstract class)
     def __init__(self, filepath: str):
         self.filepath = filepath
 
@@ -40,6 +46,7 @@ class ExcelParser(BaseFileParser):
 
 
 class CreepTestParser(AbstractParser):
+    # the object types of this case do not exist yet in bam_masterdata.datamodel.object_types
     def parse(self, files, collection, logger):
         for file in files:
             if not file.endswith(".xlsx"):
