@@ -178,4 +178,4 @@ artifacts
 # and tmp files
 tmp/
 
-tests/data/data_*.xlsx
+data_*.xlsx
