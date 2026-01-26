@@ -1,8 +1,8 @@
+import re
 from abc import ABC, abstractmethod
 
 import pandas as pd
-
-# from bam_masterdata.datamodel.object_types import ExperimentalStep
+from bam_masterdata.datamodel.object_types import ExperimentalStep
 from bam_masterdata.parsing import AbstractParser
 
 
@@ -31,6 +31,11 @@ class ExcelParser(BaseFileParser):
 
         new_df = {}
         for key, df in df_source.items():
+            # filter tabs
+            if re.search(
+                r"(Test|Schema|Chemical|Data|Measurement)", key, flags=re.IGNORECASE
+            ):
+                continue
             # extract header
             new_header = df.iloc[header_row]
 
@@ -54,5 +59,50 @@ class CreepTestParser(AbstractParser):
                 continue
 
             df = ExcelParser(file).custom_parser()
-            # map into openBIS object types
-            # ...
+
+            # first object entry
+            for key, value in df.items():
+                print(f"Processing sheet: {key}")  # logger later
+                df = value.head(5)  # 5 rows for the object
+                # optional cleanup of columns
+                df.columns = (
+                    df.columns.str.strip()
+                    .str.lower()
+                    .str.replace(" ", "_")
+                    .str.replace("/", "_")
+                )
+                parsed = {}
+                # filter relevant columns
+                df_parsed = df[
+                    [
+                        "category_i",
+                        "category_ii",
+                        "category_iii",
+                        "entry",
+                        "data_type",
+                        "requirement",
+                        "answer___options",
+                    ]
+                ].copy()
+                # extract relevant info
+                for _, row in df_parsed.iterrows():
+                    key = row["entry"]
+
+                    parsed[key] = {
+                        "category": row["category_i"],
+                        "sub_category": row["category_ii"],
+                        "group": row["category_iii"],
+                        "data_type": row["data_type"],
+                        "requirement": row["requirement"],
+                        "answer/options": row["answer___options"],
+                    }
+                # mapping example
+                Experiment = ExperimentalStep(
+                    code=parsed["Test ID"]["answer/options"],
+                    name=parsed["Project"]["answer/options"],
+                    start_date=parsed["Date of test start"]["answer/options"],
+                    end_date=parsed["Data of test end"]["answer/options"],
+                )
+                print(Experiment)
+            # later add to collection / add relations
+            # continue with next rows in "value" dataframe
