@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 from bam_masterdata.datamodel.object_types import ExperimentalStep
+from bam_masterdata.logger import logger
+from bam_masterdata.metadata.entities import CollectionType
 from bam_masterdata.parsing import AbstractParser
 
 
@@ -51,8 +53,17 @@ class ExcelParser(BaseFileParser):
 
 
 class CreepTestParser(AbstractParser):
+    def __init__(self):
+        self.object_mappings = {"Test job details": ExperimentalStep}
+        self.value_mappings = {
+            "Date of test start": "start_date",
+            "Data of test end": "end_date",
+            "Project": "name",
+            "Test ID": "code",
+        }
+
     # the object types of this case do not exist yet in bam_masterdata.datamodel.object_types
-    def parse(self, files, collection, logger):
+    def parse(self, files: list[str], collection: CollectionType, logger) -> None:
         for file in files:
             if not file.endswith(".xlsx"):
                 logger.error(f"CreepTestParser: Unsupported file type {file}")
@@ -62,8 +73,9 @@ class CreepTestParser(AbstractParser):
 
             # first object entry
             for key, value in df.items():
-                print(f"Processing sheet: {key}")  # logger later
-                df = value.head(5)  # 5 rows for the object
+                logger.info(f"Processing sheet: {key}")
+                df = value
+
                 # optional cleanup of columns
                 df.columns = (
                     df.columns.str.strip()
@@ -71,12 +83,10 @@ class CreepTestParser(AbstractParser):
                     .str.replace(" ", "_")
                     .str.replace("/", "_")
                 )
-                parsed = {}
+
                 # filter relevant columns
                 df_parsed = df[
                     [
-                        "category_i",
-                        "category_ii",
                         "category_iii",
                         "entry",
                         "data_type",
@@ -84,25 +94,33 @@ class CreepTestParser(AbstractParser):
                         "answer___options",
                     ]
                 ].copy()
-                # extract relevant info
-                for _, row in df_parsed.iterrows():
-                    key = row["entry"]
 
-                    parsed[key] = {
-                        "category": row["category_i"],
-                        "sub_category": row["category_ii"],
-                        "group": row["category_iii"],
-                        "data_type": row["data_type"],
-                        "requirement": row["requirement"],
-                        "answer/options": row["answer___options"],
+                # Group by category_iii to structure the data
+                result = {}
+                for category, group in df_parsed.groupby("category_iii"):
+                    result[category] = {
+                        row["entry"]: [
+                            row["data_type"],
+                            row["requirement"],
+                            row["answer___options"],
+                        ]
+                        for _, row in group.iterrows()
                     }
+
+                object_ids = []
                 # mapping example
-                Experiment = ExperimentalStep(
-                    code=parsed["Test ID"]["answer/options"],
-                    name=parsed["Project"]["answer/options"],
-                    start_date=parsed["Date of test start"]["answer/options"],
-                    end_date=parsed["Data of test end"]["answer/options"],
-                )
-                print(Experiment)
-            # later add to collection / add relations
-            # continue with next rows in "value" dataframe
+                for mapping_key, object_type in result.items():
+                    if mapping_key not in self.object_mappings:
+                        continue
+                    object = self.object_mappings[mapping_key]()
+                    for field, attributes in object_type.items():
+                        if field in self.value_mappings:
+                            setattr(
+                                object,
+                                self.value_mappings[field],
+                                attributes[
+                                    2
+                                ],  # assuming answer___options is the value, later for unit/symbols this needs to be adjusted
+                            )
+                    object_id = collection.add(object)
+                    object_ids.append(object_id)
