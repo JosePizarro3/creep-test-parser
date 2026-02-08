@@ -124,3 +124,4 @@ class CreepTestParser(AbstractParser):
                             )
                     object_id = collection.add(object)
                     object_ids.append(object_id)
+
