@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 from bam_masterdata.datamodel.object_types import ExperimentalStep
-from bam_masterdata.logger import logger
 from bam_masterdata.metadata.entities import CollectionType
 from bam_masterdata.parsing import AbstractParser
 
@@ -63,9 +62,7 @@ class CreepTestParser(AbstractParser):
         }
 
     # the object types of this case do not exist yet in bam_masterdata.datamodel.object_types
-    def parse(
-        self, files: list[str], collection: CollectionType, logger=logger
-    ) -> None:
+    def parse(self, files: list[str], collection: CollectionType, logger) -> None:
         for file in files:
             if not file.endswith(".xlsx"):
                 logger.error(f"CreepTestParser: Unsupported file type {file}")

@@ -10,7 +10,7 @@ class TestCreepTestParser:
     def test_parse(self):
         parser = CreepTestParser()
         collection = CollectionType()
-        test_file = Path(__file__).parent / "test.xlsx"
+        test_file = Path(__file__).parent / "data" / "test.xlsx"
         parser.parse([str(test_file)], collection, logger)
         assert collection is not None
         assert len(collection.attached_objects) == 1

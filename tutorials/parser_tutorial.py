@@ -17,7 +17,7 @@ from creep_test_parser.parser import CreepTestParser
 # Define which parser to use and which files to parse
 files_parser = {
     CreepTestParser(): [
-        "./tests/data/data_2025-06_Data-Schema_Creep_v1.1_EN AW 2618_v1.0.xlsx",
+        "./tests/data/test.xlsx",
     ]
 }
 
