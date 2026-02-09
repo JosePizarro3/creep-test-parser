@@ -63,7 +63,9 @@ class CreepTestParser(AbstractParser):
         }
 
     # the object types of this case do not exist yet in bam_masterdata.datamodel.object_types
-    def parse(self, files: list[str], collection: CollectionType, logger) -> None:
+    def parse(
+        self, files: list[str], collection: CollectionType, logger=logger
+    ) -> None:
         for file in files:
             if not file.endswith(".xlsx"):
                 logger.error(f"CreepTestParser: Unsupported file type {file}")
@@ -124,4 +126,3 @@ class CreepTestParser(AbstractParser):
                             )
                     object_id = collection.add(object)
                     object_ids.append(object_id)
-
