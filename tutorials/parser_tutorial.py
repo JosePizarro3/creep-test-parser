@@ -2,10 +2,8 @@ from decouple import config as environ
 from pybis import Openbis
 
 # Connect to openBIS
-# Add a file in your home directory named `.env` with the following content:
-# OPENBIS_URL=your_openbis_url
-# OPENBIS_USERNAME=your_username
-# OPENBIS_PASSWORD=your_password
+# Take the file `.env.example` in this repo, and rename it as `.env`. Change the
+# variables there for your own parameters
 openbis = Openbis(environ("OPENBIS_URL"))
 openbis.login(environ("OPENBIS_USERNAME"), environ("OPENBIS_PASSWORD"), save_token=True)
 
@@ -24,9 +22,9 @@ files_parser = {
 # Run the parser
 run_parser(
     openbis=openbis,
-    space_name="VP.1_JPIZARRO",
-    project_name="CREEPTEST_PROJECT",
-    collection_name="CREEPTEST_TEST_COLLECTION",
+    space_name="<SPECIFY_YOUR_SPACE>",
+    project_name="CREEPTEST_PROJECT",  # define your Project name
+    collection_name="CREEPTEST_TEST_COLLECTION",  # optional, define your Collection name
     files_parser=files_parser,
 )
 print("Parsing completed.")
