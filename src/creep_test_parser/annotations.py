@@ -252,7 +252,7 @@ ANNOTATIONS = {
                         CreepTestMaterialHistoryAndCondition, "creep_test_supply_date"
                     ),
                     "Order number": FieldMapping(
-                        CreepTestMaterialHistoryAndCondition, "workshop_order_id"
+                        CreepTestMaterialHistoryAndCondition, "creep_test_order_number"
                     ),
                     "Supplier sample ID": None,
                 },
@@ -286,11 +286,11 @@ ANNOTATIONS = {
                 "Chemical composition": {
                     "Chemical composition - nominal": FieldMapping(
                         CreepTestChemicalCompositionNominal,
-                        "chem_species_by_comp_in_pct",
+                        "creep_test_chemical_composition_nominal",
                     ),
                     "Chemical composition - measured (including precision)": FieldMapping(
                         CreepTestChemicalCompositionMeasured,
-                        "chem_species_by_comp_in_pct",
+                        "creep_test_chemical_composition_measured",
                     ),
                     "Measurement method": FieldMapping(
                         CreepTestChemicalCompositionMeasured,
@@ -394,7 +394,7 @@ ANNOTATIONS = {
                     CreepTestTestPiece, "creep_test_test_piece_id"
                 ),
                 "Workshop order ID/ref.": FieldMapping(
-                    CreepTestTestPiece, "workshop_order_id"
+                    CreepTestTestPiece, "creep_test_workshop_order_id"
                 ),
                 "Test piece history": FieldMapping(
                     CreepTestTestPiece, "creep_test_test_piece_history"
