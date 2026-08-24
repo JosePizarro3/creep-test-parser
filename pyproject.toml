@@ -27,7 +27,7 @@ maintainers = [
 ]
 license = { file = "LICENSE" }
 dependencies = [
-  "bam-masterdata>=0.11.4",
+  "bam-masterdata>=0.11.5",
 ]
 
 [project.urls]

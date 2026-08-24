@@ -1,8 +1,10 @@
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any
 
+from bam_masterdata.datamodel.creep_test import vocabularies
 from bam_masterdata.datamodel.creep_test.object_types import (
     CreepTest,
     CreepTestChemicalCompositionMeasured,
@@ -98,6 +100,53 @@ DEFAULT_CONVERTERS = {
 }
 
 
+def normalize_vocabulary_text(value: Any) -> str:
+    return re.sub(r"\s+", " ", str(value).strip()).casefold()
+
+
+def parse_controlled_vocabulary(value: Any, vocabulary_code: str) -> str | None:
+    value = parse_optional_string(value)
+    if value is None:
+        return None
+
+    normalized_value = normalize_vocabulary_text(value)
+
+    for vocabulary_class in vars(vocabularies).values():
+        defs = getattr(vocabulary_class, "defs", None)
+
+        if getattr(defs, "code", None) != vocabulary_code:
+            continue
+
+        for term in vars(vocabulary_class).values():
+            term_code = getattr(term, "code", None)
+            term_label = getattr(term, "label", None)
+
+            if term_code is None:
+                continue
+
+            normalized_term_label = normalize_vocabulary_text(term_label)
+
+            # Match either the vocabulary code itself...
+            if (
+                normalized_term_label == normalized_value
+                or normalized_term_label in normalized_value
+            ):
+                return term_code
+
+            # ...or its human-readable label.
+            if term_label is not None and (
+                normalized_term_label == normalized_value
+                or normalized_term_label in normalized_value
+            ):
+                return term_code
+
+        raise ValueError(
+            f"{value!r} is not a valid term of vocabulary {vocabulary_code!r}"
+        )
+
+    raise ValueError(f"Unknown vocabulary {vocabulary_code!r}")
+
+
 @dataclass(frozen=True)
 class FieldMapping:
     object_type: type
@@ -110,6 +159,13 @@ class FieldMapping:
             return self.converter(value)
 
         property_def = getattr(self.object_type, self.property_map)
+
+        if property_def.data_type.value == "CONTROLLEDVOCABULARY":
+            return parse_controlled_vocabulary(
+                value,
+                property_def.vocabulary_code,
+            )
+
         converter = DEFAULT_CONVERTERS.get(property_def.data_type.value)
 
         if converter is None:
