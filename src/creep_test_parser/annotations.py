@@ -88,7 +88,12 @@ def parse_datetime(value: Any) -> datetime | None:
     if value is None:
         return None
 
-    return datetime.fromisoformat(value)
+    value = re.sub(r"\s*\([^)]*\)\s*$", "", value)
+
+    return datetime.strptime(
+        value,
+        "%a %b %d %Y %H:%M:%S GMT%z",
+    )
 
 
 DEFAULT_CONVERTERS = {
