@@ -63,11 +63,11 @@ def parse_yes_no(value: Any) -> bool | None:
     if value is None:
         return None
 
-    value = value.lower()
+    normalized = value.strip().casefold()
 
-    if value == "yes":
+    if "yes" in normalized:
         return True
-    if value == "no":
+    if "no" in normalized:
         return False
 
     raise ValueError(f"Expected Yes/No value, got {value!r}")
